@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NequiBot Chatbot Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .chatbot-container {
+            position: relative;
+            min-height: 400px;
+        }
+        
+        /* Optional: Custom styling for the floating button position */
+        .floating-chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .code-block {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NequiBot Chatbot Integration Demo</h1>
+        
+        <div class="demo-section">
+            <h2>Embedded Chatbot</h2>
+            <p>The chatbot component is loaded from: <code>https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js</code></p>
+            
+            <div class="chatbot-container">
+                <!-- Basic chatbot integration -->
+                <wc-chatbot 
+                    web="true"
+                    provider="NEQUI_PERSONAL"
+                    position="fixed">
+                </wc-chatbot>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>Alternative Configuration</h2>
+            <p>Example with custom user data and different provider:</p>
+            
+            <div class="code-block">
+                &lt;wc-chatbot 
+                    web="true"
+                    provider="NEQUI_NEGOCIOS"
+                    user='{"name": "Test User", "phoneNumber": "3000000000", "email": "test@example.com"}'
+                    position="banner"&gt;
+                &lt;/wc-chatbot&gt;
+            </div>
+            
+            <!-- Alternative chatbot with different configuration -->
+            <wc-chatbot 
+                web="true"
+                provider="NEQUI_NEGOCIOS"
+                user='{"name": "Test User", "phoneNumber": "3000000000", "email": "test@example.com"}'
+                position="banner">
+            </wc-chatbot>
+        </div>
+        
+        <div class="demo-section">
+            <h2>Usage Instructions</h2>
+            <ol>
+                <li>The web component is automatically loaded from the CDN</li>
+                <li>Use the <code>&lt;wc-chatbot&gt;</code> tag to embed the chatbot</li>
+                <li>Configure the component using attributes:
+                    <ul>
+                        <li><strong>web</strong>: "true" for web interface, "false" for mobile</li>
+                        <li><strong>provider</strong>: "NEQUI_PERSONAL" or "NEQUI_NEGOCIOS"</li>
+                        <li><strong>position</strong>: "fixed", "banner", etc.</li>
+                        <li><strong>user</strong>: JSON string with user information (optional)</li>
+                    </ul>
+                </li>
+                <li>The chatbot will appear as a floating button that users can click to start a conversation</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Load the Web Component from the provided URL -->
+    <script type="module" src="https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js"></script>
+    
+    <!-- Optional: Custom JavaScript for interaction -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('NequiBot Chatbot loaded successfully');
+            
+            // Optional: Listen for chatbot events
+            const chatbots = document.querySelectorAll('wc-chatbot');
+            chatbots.forEach(chatbot => {
+                chatbot.addEventListener('chat:message-sent', (event) => {
+                    console.log('Message sent:', event.detail);
+                });
+                
+                chatbot.addEventListener('chat:escalation-requested', (event) => {
+                    console.log('Escalation requested:', event.detail);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
