@@ -26,6 +26,31 @@
             margin-bottom: 30px;
         }
         
+        .status-indicator {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .status-loading {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
         h1 {
             color: #333;
             text-align: center;
@@ -37,19 +62,6 @@
             margin-bottom: 20px;
         }
         
-        .chatbot-container {
-            position: relative;
-            min-height: 400px;
-        }
-        
-        /* Optional: Custom styling for the floating button position */
-        .floating-chatbot {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        
         .code-block {
             background: #f8f8f8;
             padding: 15px;
@@ -58,77 +70,163 @@
             margin: 10px 0;
             overflow-x: auto;
         }
+
+        .error-details {
+            background: #ffebee;
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid #f44336;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>NequiBot Chatbot Integration Demo</h1>
+        <h1>NequiBot Chatbot Integration</h1>
         
-        <div class="demo-section">
-            <h2>Embedded Chatbot</h2>
-            <p>The chatbot component is loaded from: <code>https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js</code></p>
-            
-            <div class="chatbot-container">
-                <!-- Basic chatbot integration -->
-                <wc-chatbot 
-                    web="true"
-                    provider="NEQUI_PERSONAL"
-                    position="fixed">
-                </wc-chatbot>
-            </div>
+        <div id="status" class="status-indicator status-loading">
+            🔄 Attempting to load chatbot component...
         </div>
         
         <div class="demo-section">
-            <h2>Alternative Configuration</h2>
-            <p>Example with custom user data and different provider:</p>
-            
-            <div class="code-block">
-                &lt;wc-chatbot 
-                    web="true"
-                    provider="NEQUI_NEGOCIOS"
-                    user='{"name": "Test User", "phoneNumber": "3000000000", "email": "test@example.com"}'
-                    position="banner"&gt;
-                &lt;/wc-chatbot&gt;
+            <h2>Chatbot Integration</h2>
+            <div id="chatbot-container">
+                <!-- Chatbot will be inserted here -->
             </div>
-            
-            <!-- Alternative chatbot with different configuration -->
-            <wc-chatbot 
-                web="true"
-                provider="NEQUI_NEGOCIOS"
-                user='{"name": "Test User", "phoneNumber": "3000000000", "email": "test@example.com"}'
-                position="banner">
-            </wc-chatbot>
         </div>
         
-        <div class="demo-section">
-            <h2>Usage Instructions</h2>
-            <ol>
-                <li>The web component is automatically loaded from the CDN</li>
-                <li>Use the <code>&lt;wc-chatbot&gt;</code> tag to embed the chatbot</li>
-                <li>Configure the component using attributes:
-                    <ul>
-                        <li><strong>web</strong>: "true" for web interface, "false" for mobile</li>
-                        <li><strong>provider</strong>: "NEQUI_PERSONAL" or "NEQUI_NEGOCIOS"</li>
-                        <li><strong>position</strong>: "fixed", "banner", etc.</li>
-                        <li><strong>user</strong>: JSON string with user information (optional)</li>
-                    </ul>
-                </li>
-                <li>The chatbot will appear as a floating button that users can click to start a conversation</li>
-            </ol>
+        <div class="demo-section" id="fallback-section" style="display: none;">
+            <h2>CORS Workaround Information</h2>
+            <div class="error-details">
+                <h3>CORS Issue Detected</h3>
+                <p><strong>Problem:</strong> The external chatbot script doesn't allow loading from GitHub Pages.</p>
+                <p><strong>Current Origin:</strong> <span id="current-origin"></span></p>
+                
+                <h4>Solutions:</h4>
+                <ol>
+                    <li><strong>Use a Proxy Service:</strong> Deploy through Netlify or Vercel with proxy functions</li>
+                    <li><strong>Local Development:</strong> Use a local HTTP server for testing</li>
+                    <li><strong>Alternative Hosting:</strong> Host on a domain with CORS access</li>
+                </ol>
+                
+                <h4>For Local Testing:</h4>
+                <div class="code-block">
+# Download and serve locally<br>
+curl -o wc-main-mas.js https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js<br>
+python -m http.server 8000
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Load the Web Component from the provided URL -->
-    <script type="module" src="https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js"></script>
-    
-    <!-- Optional: Custom JavaScript for interaction -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('NequiBot Chatbot loaded successfully');
+    <script type="module">
+        const statusElement = document.getElementById('status');
+        const chatbotContainer = document.getElementById('chatbot-container');
+        const fallbackSection = document.getElementById('fallback-section');
+        const currentOriginElement = document.getElementById('current-origin');
+        
+        // Set current origin info
+        currentOriginElement.textContent = location.origin;
+        
+        // List of proxy URLs to try
+        const proxyUrls = [
+            // Direct URL (will likely fail on GitHub Pages)
+            'https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js',
+            // Public CORS proxies (use with caution in production)
+            'https://cors-anywhere.herokuapp.com/https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js',
+            'https://api.allorigins.win/raw?url=https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js'
+        ];
+        
+        async function loadChatbotWithFallback() {
+            for (let i = 0; i < proxyUrls.length; i++) {
+                const url = proxyUrls[i];
+                const isProxy = i > 0;
+                
+                try {
+                    statusElement.innerHTML = `🔄 Trying ${isProxy ? 'proxy' : 'direct'} method ${i + 1}/${proxyUrls.length}...`;
+                    
+                    if (isProxy) {
+                        // For proxy URLs, fetch the script content and execute it
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        
+                        const scriptContent = await response.text();
+                        
+                        // Create and execute script
+                        const script = document.createElement('script');
+                        script.type = 'module';
+                        script.textContent = scriptContent;
+                        document.head.appendChild(script);
+                        
+                        // Wait a bit for the component to register
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    } else {
+                        // Direct import
+                        await import(url);
+                    }
+                    
+                    // If we get here, loading was successful
+                    statusElement.className = 'status-indicator status-success';
+                    statusElement.innerHTML = `✅ Chatbot loaded successfully using ${isProxy ? 'proxy' : 'direct'} method!`;
+                    
+                    // Create chatbot instances
+                    createChatbotInstances();
+                    return;
+                    
+                } catch (error) {
+                    console.error(`Failed to load from ${url}:`, error);
+                    
+                    if (i === proxyUrls.length - 1) {
+                        // All methods failed
+                        statusElement.className = 'status-indicator status-error';
+                        statusElement.innerHTML = '❌ All loading methods failed. See details below.';
+                        fallbackSection.style.display = 'block';
+                        
+                        chatbotContainer.innerHTML = `
+                            <div class="error-details">
+                                <h3>Component Loading Failed</h3>
+                                <p><strong>Attempted URLs:</strong></p>
+                                <ul>
+                                    ${proxyUrls.map((url, idx) => `<li>${idx === 0 ? 'Direct: ' : 'Proxy: '}<code>${url}</code></li>`).join('')}
+                                </ul>
+                                <p><strong>Last error:</strong> ${error.message}</p>
+                                
+                                <h4>Alternative: Download and Host Locally</h4>
+                                <p>For development/testing, you can download the component and host it locally:</p>
+                                <div class="code-block">
+mkdir chatbot-local<br>
+cd chatbot-local<br>
+curl -o wc-main-mas.js https://web-components-dev.bancadigital.com.co/wc-chatbot-mas/wc-main-mas.js<br>
+python -m http.server 8000
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            }
+        }
+        
+        function createChatbotInstances() {
+            // Create first chatbot instance
+            const chatbot1 = document.createElement('wc-chatbot');
+            chatbot1.setAttribute('web', 'true');
+            chatbot1.setAttribute('provider', 'NEQUI_PERSONAL');
+            chatbot1.setAttribute('position', 'fixed');
             
-            // Optional: Listen for chatbot events
-            const chatbots = document.querySelectorAll('wc-chatbot');
-            chatbots.forEach(chatbot => {
+            // Create second chatbot instance for the demo
+            const chatbot2 = document.createElement('wc-chatbot');
+            chatbot2.setAttribute('web', 'true');
+            chatbot2.setAttribute('provider', 'NEQUI_NEGOCIOS');
+            chatbot2.setAttribute('user', '{"name": "Test User", "phoneNumber": "3000000000", "email": "test@example.com"}');
+            chatbot2.setAttribute('position', 'banner');
+            
+            // Add to container
+            chatbotContainer.appendChild(chatbot1);
+            chatbotContainer.appendChild(document.createElement('br'));
+            chatbotContainer.appendChild(chatbot2);
+            
+            // Set up event listeners
+            [chatbot1, chatbot2].forEach(chatbot => {
                 chatbot.addEventListener('chat:message-sent', (event) => {
                     console.log('Message sent:', event.detail);
                 });
@@ -137,6 +235,17 @@
                     console.log('Escalation requested:', event.detail);
                 });
             });
+        }
+        
+        // Start loading process
+        loadChatbotWithFallback();
+        
+        // Log diagnostic info
+        console.log('Diagnostic Info:', {
+            origin: location.origin,
+            hostname: location.hostname,
+            protocol: location.protocol,
+            userAgent: navigator.userAgent
         });
     </script>
 </body>
